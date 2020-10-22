@@ -159,9 +159,21 @@ void ball_move(ball* _b, bar _br1, bar _br2)
 		_b->pos.x += _b->vel.x;
 		_b->pos.x += _b->vel.x;
 	}
+	if (_b->pos.y >= _br2.pos.y && _b->pos.y <= _br2.pos.y+_br2.len &&
+		_b->pos.x == _br2.pos.x)
+	{
+		_b->vel.x *= -1;
+		_b->pos.x += _b->vel.x;
+		_b->pos.x += _b->vel.x;
+	}
 }
-void ball_collide(ball* _b)
+void move_ai(bar* _b, ball _p)
 {
+	int y = _b->pos.y+(_b->len-3);
+	if (_p.pos.y > y && _p.pos.y+_b->len <= g_ysize)
+		_b->pos.y+=2;
+	else if (_p.pos.y <= y && _p.pos.y-4 >= 0)
+		_b->pos.y-=2;
 }
 
 void main_game(int _c)
@@ -174,6 +186,7 @@ void main_game(int _c)
 	draw_borders();
 
 	bar player = make_bar(make_ddVec2(2,2), 6, make_ddColor(255,255,255));
+	bar ai = make_bar(make_ddVec2(58,2), 6, make_ddColor(255,255,255));
 	ball pong = make_ball(make_ddVec2(30,15), make_ddVec2(1,1), make_ddColor(255,255,255));
 	draw_ball(pong);
 	draw_bar(player);
@@ -181,9 +194,13 @@ void main_game(int _c)
 	for(;;)
 	{
 		clear_ball(pong);
-		ball_move(&pong, player, player);
+		ball_move(&pong, player, ai);
 		draw_ball(pong);
 		draw_cline();
+
+		clear_bar(ai);
+		move_ai(&ai, pong);
+		draw_bar(ai);
 		if (g_cinput == DDK_UP && player.pos.y-2 >= 0)
 		{
 			clear_bar(player);
