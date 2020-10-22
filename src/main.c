@@ -12,6 +12,8 @@
 #include <stdlib.h> 
 #include "utils.h"
 
+void main_game(int);
+
 const int g_xpadding = 24;
 const int g_ypadding = 10;
 const int g_xsize    = 170-g_xpadding;
@@ -101,8 +103,11 @@ void* game_getinput(void* _v)
 {
 	for(;;)
 	{
-		g_cinput = ddKey_getch();
-		if (g_cinput == DDK_p) g_cinput = !g_cinput;
+		while (g_gameRunning)
+		{
+			g_cinput = ddKey_getch();
+			if (g_cinput == DDK_p) g_cinput = !g_cinput;
+		}
 	}
 }
 
@@ -119,6 +124,10 @@ void draw_cline(void)
 		cursor_move(-1,1);
 	}
 }
+void wall_hit(int w)
+{
+	main_game(0);
+}
 void ball_move(ball* _b, bar _br1, bar _br2)
 {
 	ddVec2 bn = ball_next(*_b);
@@ -129,11 +138,12 @@ void ball_move(ball* _b, bar _br1, bar _br2)
 		if (bn.x <= 0)
 		{
 			_b->pos.x = 0;
+			wall_hit(0);
 		}
 		else if (bn.x*2 >= g_xsize-g_xpadding-2)
 		{
 			_b->pos.x = (int)((g_xsize-g_xpadding)/2)-1;
-
+			wall_hit(1);
 		}
 		_b->vel.x *= -1;
 	}
@@ -178,8 +188,9 @@ void move_ai(bar* _b, ball _p)
 
 void main_game(int _c)
 {
-	pthread_t getkeys;
-	pthread_create(&getkeys, null, game_getinput, null);
+	g_gameRunning = true;
+
+	srand(time(null));
 
 	cursor_clear();
 	draw_title(2);
@@ -187,7 +198,7 @@ void main_game(int _c)
 
 	bar player = make_bar(make_ddVec2(2,2), 6, make_ddColor(255,255,255));
 	bar ai = make_bar(make_ddVec2(58,2), 6, make_ddColor(255,255,255));
-	ball pong = make_ball(make_ddVec2(30,15), make_ddVec2(1,1), make_ddColor(255,255,255));
+	ball pong = make_ball(make_ddVec2(30+((int)(rand()%20+1))-10,15+((int)(rand()%10+1))-5), make_ddVec2(1,1), make_ddColor(255,255,255));
 	draw_ball(pong);
 	draw_bar(player);
 	cursor_home();
@@ -226,6 +237,10 @@ void main_game(int _c)
 
 int main(void)
 {
+	g_gameRunning = false;
+	pthread_t getkeys;
+	pthread_create(&getkeys, null, game_getinput, null);
+
 	init_cursor();
 	cursor_clear();
 
