@@ -110,14 +110,23 @@ ddVec2 ball_next(ball _b)
 {
 	return make_ddVec2(_b.pos.x+_b.vel.x, _b.pos.y+_b.vel.y);
 }
+void draw_cline(void)
+{
+	cursor_moveTo((g_xsize+20)/2, g_ypadding);
+	for (int i = 0; i < g_ysize-2; i++)
+	{
+		cursor_chWrite(cset_block);
+		cursor_move(-1,1);
+	}
+}
 void ball_move(ball* _b, bar _br1, bar _br2)
 {
 	ddVec2 bn = ball_next(*_b);
-	if (bn.x >= 0+1 && bn.x*2 < g_xsize-g_xpadding-2)
+	if (bn.x > 0 && bn.x*2 < g_xsize-g_xpadding-2)
 		_b->pos.x += _b->vel.x;
 	else
 	{
-		if (bn.x < 0+1)
+		if (bn.x <= 0)
 		{
 			_b->pos.x = 0;
 		}
@@ -128,11 +137,11 @@ void ball_move(ball* _b, bar _br1, bar _br2)
 		}
 		_b->vel.x *= -1;
 	}
-	if (bn.y >= 0 && bn.y <  g_ysize-4)
+	if (bn.y > 0 && bn.y <  g_ysize-4)
 		_b->pos.y += _b->vel.y;
 	else
 	{
-		if (bn.y < 0)
+		if (bn.y <= 0)
 		{
 			_b->pos.y = 0;
 		}
@@ -143,10 +152,11 @@ void ball_move(ball* _b, bar _br1, bar _br2)
 		}
 		_b->vel.y *= -1;
 	}
-	if (_b->pos.y >= _br1.pos.y && _b->pos.y < _br1.pos.y+_br1.len &&
-		_b->pos.x-1 <= _br1.pos.x)
+	if (_b->pos.y >= _br1.pos.y && _b->pos.y <= _br1.pos.y+_br1.len &&
+		_b->pos.x == _br1.pos.x)
 	{
 		_b->vel.x *= -1;
+		_b->pos.x += _b->vel.x;
 		_b->pos.x += _b->vel.x;
 	}
 }
@@ -163,8 +173,8 @@ void main_game(int _c)
 	draw_title(2);
 	draw_borders();
 
-	bar player = make_bar(make_ddVec2(2,2), 6, make_ddColor(0,255,0));
-	ball pong = make_ball(make_ddVec2(30,15), make_ddVec2(2,2), make_ddColor(255,255,0));
+	bar player = make_bar(make_ddVec2(2,2), 6, make_ddColor(255,255,255));
+	ball pong = make_ball(make_ddVec2(30,15), make_ddVec2(1,1), make_ddColor(255,255,255));
 	draw_ball(pong);
 	draw_bar(player);
 	cursor_home();
@@ -173,6 +183,7 @@ void main_game(int _c)
 		clear_ball(pong);
 		ball_move(&pong, player, player);
 		draw_ball(pong);
+		draw_cline();
 		if (g_cinput == DDK_UP && player.pos.y-2 >= 0)
 		{
 			clear_bar(player);
@@ -191,7 +202,7 @@ void main_game(int _c)
 			g_cinput = null;
 			cursor_home();
 		}
-		usleep(100000);
+		usleep(50000);
 	}
 }
 
