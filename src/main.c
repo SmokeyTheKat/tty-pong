@@ -188,6 +188,18 @@ void move_ai(bar* _b, ball _p, int lev)
 			_b->pos.y-=2;
 	}
 }
+void move_ai2(bar* _b, ball _p, int lev)
+{
+	if (_p.pos.x <= lev)
+	{
+		int y = _b->pos.y+(_b->len-3);
+		if (_p.pos.y > y && _p.pos.y+_b->len <= g_ysize)
+			_b->pos.y+=2;
+		else if (_p.pos.y < y && _p.pos.y-4 >= 0)
+			_b->pos.y-=2;
+	}
+}
+
 
 void main_game(int _c)
 {
@@ -244,6 +256,25 @@ void main_game(int _c)
 	cursor_home();
 	for(;;)
 	{
+		if (_c == 5)
+		{
+			clear_ball(pong);
+			ball_move(&pong, player, ai, _c);
+			draw_ball(pong);
+			draw_cline();
+
+			clear_bar(ai);
+			move_ai(&ai, pong, aidif);
+			draw_bar(ai);
+
+			clear_bar(player);
+			move_ai2(&player, pong, 14);
+			draw_bar(player);
+
+			cursor_home();
+			usleep(blspeed);
+			continue;
+		}
 		clear_ball(pong);
 		ball_move(&pong, player, ai, _c);
 		draw_ball(pong);
@@ -309,13 +340,14 @@ int main(void)
 	ddSelect ds = make_ddSelect(make_ddVec2(70,12),
 				      make_ddVec2(30,20),
 				      make_dft_ddText(make_constant_ddString("PONG")),
-				      make_ddColor(0,0,255), 6, make_ddColor(0,100,55));
+				      make_ddColor(0,0,255), 7, make_ddColor(0,100,55));
 
 	ddSelect_addOption(&ds, make_dft_ddText(make_ddString("Solo Easy")), main_game);
 	ddSelect_addOption(&ds, make_dft_ddText(make_ddString("Solo Medium")), main_game);
 	ddSelect_addOption(&ds, make_dft_ddText(make_ddString("Solo hard")), main_game);
 	ddSelect_addOption(&ds, make_dft_ddText(make_ddString("2 Player")), main_game);
 	ddSelect_addOption(&ds, make_dft_ddText(make_ddString("Practice")), main_game);
+	ddSelect_addOption(&ds, make_dft_ddText(make_ddString("CPU v CPU")), main_game);
 	ddSelect_addOption(&ds, make_dft_ddText(make_ddString("Exit")), exit_game);
 
 	ddGArray_push(&(v_da.drawStack), ds);
