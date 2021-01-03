@@ -1,1 +1,1 @@
-# ttyPong
+# tty-pong

@@ -1,12 +1,12 @@
-#include <ddcString.h>
-#include <ddcPrint.h>
-#include <ddcTime.h>
-#include <ddcDef.h>
-#include <ddcArguments.h>
-#include <ddcApplication.h>
-#include <ddcCursor.h>
-#include <ddcKeyboard.h>
-#include <ddcCharSets.h>
+#include "../lib/ddcString/ddcString.h"
+#include "../lib/ddcPrint/ddcPrint.h"
+#include "../lib/ddcTime/ddcTime.h"
+#include "../lib/ddcDef/ddcDef.h"
+#include "../lib/ddcArguments/ddcArguments.h"
+#include "../lib/ddcScreen/ddcApplication/ddcApplication.h"
+#include "../lib/ddcScreen/ddcCursor/ddcCursor.h"
+#include "../lib/ddcKeyboard/ddcKeyboard.h"
+#include "../lib/ddcCharSets/ddcCharSets.h"
 #include <time.h>
 #include <pthread.h> 
 #include <stdlib.h> 
@@ -51,49 +51,53 @@ ball make_ball(ddVec2 _pos, ddVec2 _vel, ddColor _col)
 }
 void draw_ball(ball _b)
 {
-	cursor_colorPush();
-	cursor_setFGColor(_b.color);
-	cursor_moveTo(g_xpadding + (_b.pos.x*2),
+	cursor_color_push();
+	cursor_set_fg_color(_b.color);
+	cursor_move_to(g_xpadding + (_b.pos.x*2),
 			g_ypadding + _b.pos.y);
-	cursor_chWrite(cset_block);
-	cursor_chWrite(cset_block);
-	cursor_colorPop();
+	cursor_write_cstring(cset_block);
+	cursor_write_cstring(cset_block);
+	cursor_color_pop();
 }
 void clear_ball(ball _b)
 {
-	cursor_colorPush();
-	cursor_moveTo(g_xpadding + (_b.pos.x*2),
+	cursor_color_push();
+	cursor_move_to(g_xpadding + (_b.pos.x*2),
 			g_ypadding + _b.pos.y);
-	cursor_chWrite(" ");
-	cursor_chWrite(" ");
-	cursor_colorPop();
+	cursor_write_cstring(" ");
+	cursor_write_cstring(" ");
+	cursor_color_pop();
 }
 void draw_bar(bar _b)
 {
-	cursor_colorPush();
-	cursor_setFGColor(_b.color);
-	cursor_moveTo(g_xpadding + (_b.pos.x*2),
+	cursor_color_push();
+	cursor_set_fg_color(_b.color);
+	cursor_move_to(g_xpadding + (_b.pos.x*2),
 			g_ypadding + _b.pos.y);
 	for (int i = 0; i < _b.len; i++)
 	{
-		cursor_chWrite(cset_block);
-		cursor_chWrite(cset_block);
-		cursor_move(-2, 1);
+		cursor_write_cstring(cset_block);
+		cursor_write_cstring(cset_block);
+		cursor_move_left();
+		cursor_move_left();
+		cursor_move_down();
 	}
-	cursor_colorPop();
+	cursor_color_pop();
 }
 void clear_bar(bar _b)
 {
-	cursor_colorPush();
-	cursor_moveTo(g_xpadding + (_b.pos.x*2),
+	cursor_color_push();
+	cursor_move_to(g_xpadding + (_b.pos.x*2),
 			g_ypadding + _b.pos.y);
 	for (int i = 0; i < _b.len; i++)
 	{
-		cursor_chWrite(" ");
-		cursor_chWrite(" ");
-		cursor_move(-2, 1);
+		cursor_write_cstring(" ");
+		cursor_write_cstring(" ");
+		cursor_move_left();
+		cursor_move_left();
+		cursor_move_down();
 	}
-	cursor_colorPop();
+	cursor_color_pop();
 }
 
 bool g_gameRunning;
@@ -117,18 +121,18 @@ ddVec2 ball_next(ball _b)
 }
 void draw_cline(void)
 {
-	cursor_moveTo((g_xsize+20)/2, g_ypadding);
+	cursor_move_to((g_xsize+20)/2, g_ypadding);
 	for (int i = 0; i < g_ysize-2; i++)
 	{
-		cursor_chWrite(cset_block);
+		cursor_write_cstring(cset_block);
 		cursor_move(-1,1);
 	}
 }
-void wall_hit(int w)
+void wall_hit(int w, int _c)
 {
-	main_game(0);
+	main_game(_c);
 }
-void ball_move(ball* _b, bar _br1, bar _br2)
+void ball_move(ball* _b, bar _br1, bar _br2, int _c)
 {
 	ddVec2 bn = ball_next(*_b);
 	if (bn.x > 0 && bn.x*2 < g_xsize-g_xpadding-2)
@@ -138,12 +142,12 @@ void ball_move(ball* _b, bar _br1, bar _br2)
 		if (bn.x <= 0)
 		{
 			_b->pos.x = 0;
-			wall_hit(0);
+			wall_hit(0, _c);
 		}
 		else if (bn.x*2 >= g_xsize-g_xpadding-2)
 		{
 			_b->pos.x = (int)((g_xsize-g_xpadding)/2)-1;
-			wall_hit(1);
+			wall_hit(1, _c);
 		}
 		_b->vel.x *= -1;
 	}
@@ -177,14 +181,29 @@ void ball_move(ball* _b, bar _br1, bar _br2)
 		_b->pos.x += _b->vel.x;
 	}
 }
-void move_ai(bar* _b, ball _p)
+void move_ai(bar* _b, ball _p, int lev)
 {
-	int y = _b->pos.y+(_b->len-3);
-	if (_p.pos.y > y && _p.pos.y+_b->len <= g_ysize)
-		_b->pos.y+=2;
-	else if (_p.pos.y <= y && _p.pos.y-4 >= 0)
-		_b->pos.y-=2;
+	if (_p.pos.x >= lev)
+	{
+		int y = _b->pos.y+(_b->len-3);
+		if (_p.pos.y > y && _p.pos.y+_b->len <= g_ysize)
+			_b->pos.y+=2;
+		else if (_p.pos.y < y && _p.pos.y-4 >= 0)
+			_b->pos.y-=2;
+	}
 }
+void move_ai2(bar* _b, ball _p, int lev)
+{
+	if (_p.pos.x <= lev)
+	{
+		int y = _b->pos.y+(_b->len-3);
+		if (_p.pos.y > y && _p.pos.y+_b->len <= g_ysize)
+			_b->pos.y+=2;
+		else if (_p.pos.y < y && _p.pos.y-4 >= 0)
+			_b->pos.y-=2;
+	}
+}
+
 
 void main_game(int _c)
 {
@@ -192,34 +211,110 @@ void main_game(int _c)
 
 	srand(time(null));
 
+	int aidif;
+	int blspeed;
+
+	switch (_c)
+	{
+		case 0:
+			aidif = 46;
+			blspeed = 63000;
+			break;
+		case 1:
+			aidif = 42;
+			blspeed = 50000;
+			break;
+		case 2:
+			aidif = 38;
+			blspeed = 33000;
+			break;
+		case 3:
+			aidif = 38;
+			blspeed = 40000;
+			break;
+		default:
+			aidif = 42;
+			blspeed = 50000;
+			break;
+	}
+
 	cursor_clear();
 	draw_title(2);
 	draw_borders();
 
-	bar player = make_bar(make_ddVec2(2,2), 6, make_ddColor(255,255,255));
-	bar ai = make_bar(make_ddVec2(58,2), 6, make_ddColor(255,255,255));
+	bar player;
+	bar ai;
 	ball pong = make_ball(make_ddVec2(30+((int)(rand()%20+1))-10,15+((int)(rand()%10+1))-5), make_ddVec2(1,1), make_ddColor(255,255,255));
+	if (_c == 3)
+	{
+		ai = make_bar(make_ddVec2(2,20), 6, make_ddColor(255,255,255));
+		player = make_bar(make_ddVec2(58,20), 6, make_ddColor(255,255,255));
+	}
+	else
+	{
+		player = make_bar(make_ddVec2(2,20), 6, make_ddColor(255,255,255));
+		ai = make_bar(make_ddVec2(58,20), 6, make_ddColor(255,255,255));
+	}
 	draw_ball(pong);
 	draw_bar(player);
 	cursor_home();
 	for(;;)
 	{
+		if (_c == 5)
+		{
+			clear_ball(pong);
+			ball_move(&pong, player, ai, _c);
+			draw_ball(pong);
+			draw_cline();
+
+			clear_bar(ai);
+			move_ai(&ai, pong, aidif);
+			draw_bar(ai);
+
+			clear_bar(player);
+			move_ai2(&player, pong, 14);
+			draw_bar(player);
+
+			cursor_home();
+			usleep(blspeed);
+			continue;
+		}
 		clear_ball(pong);
-		ball_move(&pong, player, ai);
+		ball_move(&pong, player, ai, _c);
 		draw_ball(pong);
 		draw_cline();
 
-		clear_bar(ai);
-		move_ai(&ai, pong);
-		draw_bar(ai);
+		if (_c == 3)
+		{
+			if (g_cinput == DDK_w && ai.pos.y-2 >= 0)
+			{
+				clear_bar(ai);
+				ai.pos.y--;
+				ai.pos.y--;
+				draw_bar(ai);
+			}
+			else if (g_cinput == DDK_s && ai.pos.y+ ai.len+4 <= g_ysize)
+			{
+				clear_bar(ai);
+				ai.pos.y++;
+				ai.pos.y++;
+				draw_bar(ai);
+			}
+			clear_bar(ai);
+			draw_bar(ai);
+		}
+		else if (_c != 4)
+		{
+			clear_bar(ai);
+			move_ai(&ai, pong,aidif);
+			draw_bar(ai);
+		}
 		if (g_cinput == DDK_UP && player.pos.y-2 >= 0)
 		{
 			clear_bar(player);
 			player.pos.y--;
 			player.pos.y--;
 			draw_bar(player);
-			g_cinput = null;
-			cursor_home();
 		}
 		else if (g_cinput == DDK_DOWN && player.pos.y+player.len+4 <= g_ysize)
 		{
@@ -227,10 +322,10 @@ void main_game(int _c)
 			player.pos.y++;
 			player.pos.y++;
 			draw_bar(player);
-			g_cinput = null;
-			cursor_home();
 		}
-		usleep(50000);
+		g_cinput = null;
+		cursor_home();
+		usleep(blspeed);
 	}
 }
 
@@ -249,9 +344,14 @@ int main(void)
 	ddSelect ds = make_ddSelect(make_ddVec2(70,12),
 				      make_ddVec2(30,20),
 				      make_dft_ddText(make_constant_ddString("PONG")),
-				      make_ddColor(0,0,255), 5, make_ddColor(0,100,55));
+				      make_ddColor(0,0,255), 7, make_ddColor(0,100,55));
 
-	ddSelect_addOption(&ds, make_dft_ddText(make_ddString("Play")), main_game);
+	ddSelect_addOption(&ds, make_dft_ddText(make_ddString("Solo Easy")), main_game);
+	ddSelect_addOption(&ds, make_dft_ddText(make_ddString("Solo Medium")), main_game);
+	ddSelect_addOption(&ds, make_dft_ddText(make_ddString("Solo hard")), main_game);
+	ddSelect_addOption(&ds, make_dft_ddText(make_ddString("2 Player")), main_game);
+	ddSelect_addOption(&ds, make_dft_ddText(make_ddString("Practice")), main_game);
+	ddSelect_addOption(&ds, make_dft_ddText(make_ddString("CPU v CPU")), main_game);
 	ddSelect_addOption(&ds, make_dft_ddText(make_ddString("Exit")), exit_game);
 
 	ddGArray_push(&(v_da.drawStack), ds);

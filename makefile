@@ -1,8 +1,6 @@
-#compile the shit yo
-install:
-	gcc ./src/main.c -o ./main -lm -lpthread
-full:
-	gcc ./src/main.c -o ./main -lm -lpthread
-	cp ./main /usr/bin/ttyPong
+all:
+	gcc ./src/main.c -o ./tty-pong -lm -lpthread
+install: all
+	sudo cp ./tty-pong /usr/bin/tty-pong
 remove:
-	rm /usr/bin/ttyPong
+	sudo rm /usr/bin/tty-pong
