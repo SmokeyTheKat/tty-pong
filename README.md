@@ -14,7 +14,7 @@ make targets
 
 Just use:
 ```
-$ make full
+$ make install
 ```
 to use anywhere.
 
