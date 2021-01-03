@@ -1,7 +1,4 @@
 # tty-pong
-<<<<<<< HEAD
-=======
-
 Simple terminal pong game yo.
 
 ## Compalaition
@@ -40,6 +37,3 @@ Controls:
 | Move Right | S or Down Arrow | Moves Down |
 | Menu | Escape | Returns to menu |
 | Quit | Escape | Exits game if on menu |
-
-
->>>>>>> 72f76ac835c224b0ab2476c01aca29816660af43
