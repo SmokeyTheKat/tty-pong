@@ -2,12 +2,12 @@
 #define __ddcShapes__
 
 
-#include <ddcVec.h>
-#include <ddcCursor.h>
-#include <ddcPrint.h>
-#include <ddcMath.h>
-#include <ddcCharSets.h>
-#include <ddcLine.h>
+#include "../../ddcVec/ddcVec.h"
+#include "../ddcCursor/ddcCursor.h"
+#include "../../ddcPrint/ddcPrint.h"
+#include "../../ddcMath/ddcMath.h"
+#include "../../ddcCharSets/ddcCharSets.h"
+#include "../ddcLine/ddcLine.h"
 
 
 typedef struct ddSquare ddSquare;

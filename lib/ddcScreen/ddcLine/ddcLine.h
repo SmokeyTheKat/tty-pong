@@ -1,12 +1,12 @@
 #ifndef __ddcLine__
 #define __ddcLine__
 
-#include <ddcCursor.h>
-#include <ddcString.h>
-#include <ddcMath.h>
-#include <ddcVec.h>
-#include <ddcPrint.h>
-#include <ddcCharSets.h>
+#include "../ddcCursor/ddcCursor.h"
+#include "../../ddcString/ddcString.h"
+#include "../../ddcMath/ddcMath.h"
+#include "../../ddcVec/ddcVec.h"
+#include "../../ddcPrint/ddcPrint.h"
+#include "../../ddcCharSets/ddcCharSets.h"
 
 #include <stdio.h>
 

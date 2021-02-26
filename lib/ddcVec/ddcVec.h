@@ -1,7 +1,7 @@
 #ifndef __ddVec__
 #define __ddVec__
 
-#include <ddcDef.h>
+#include "../ddcDef/ddcDef.h"
 #include <math.h>
 
 typedef struct ddVec2 ddVec2;

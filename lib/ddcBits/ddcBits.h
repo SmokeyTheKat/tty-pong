@@ -1,8 +1,8 @@
 #ifndef __ddclib_ddcBits_h__
 #define __ddclib_ddcBits_h__
 
-#include <ddcDef.h>
-#include <ddcPrint.h>
+#include "../ddcDef/ddcDef.h"
+#include "../ddcPrint/ddcPrint.h"
 
 typedef unsigned char byte;
 

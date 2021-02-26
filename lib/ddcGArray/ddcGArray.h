@@ -1,7 +1,7 @@
-#include <ddcDef.h>
-#include <ddcPrint.h>
-#include <ddcString.h>
-#include <ddcLine.h>
+#include "../ddcDef/ddcDef.h"
+#include "../ddcPrint/ddcPrint.h"
+#include "../ddcString/ddcString.h"
+#include "../ddcScreen/ddcLine/ddcLine.h"
 #include <stdio.h>
 
 #define ddGArray_get(h, i, t) (*((t*)__ddGArray_get(h, i)))

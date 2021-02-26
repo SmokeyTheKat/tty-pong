@@ -1,7 +1,7 @@
 #ifndef __ddcMath__
 #define __ddcMath__
 
-#include <ddcDef.h>
+#include "../ddcDef/ddcDef.h"
 #include <math.h>
 
 double ddMath_abs(double n);

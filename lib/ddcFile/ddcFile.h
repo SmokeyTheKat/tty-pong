@@ -1,8 +1,8 @@
 #ifndef __ddcFile__
 #define __ddcFile__
 
-#include <ddcString.h>
-#include <ddcPrint.h>
+#include "../ddcString/ddcString.h"
+#include "../ddcPrint/ddcPrint.h"
 
 void readf(const char* name)
 {

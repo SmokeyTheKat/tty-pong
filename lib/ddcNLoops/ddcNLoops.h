@@ -1,7 +1,7 @@
 #ifndef __ddcNLoops__
 #define __ddcNLoops__
 
-#include <ddcDef.h>
+#include "../ddcDef/ddcDef.h"
 #include <math.h>
 
 typedef struct ddNLoop ddNLoop;

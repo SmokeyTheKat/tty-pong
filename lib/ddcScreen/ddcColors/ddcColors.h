@@ -1,9 +1,9 @@
 #ifndef __ddcColors__
 #define __ddcColors__
 
-#include <ddcDef.h>
-#include <ddcString.h>
-#include <ddcPrint.h>
+#include "../../ddcDef/ddcDef.h"
+#include "../../ddcString/ddcString.h"
+#include "../../ddcPrint/ddcPrint.h"
 
 typedef struct ddFColor ddFColor;
 typedef struct ddBColor ddBColor;
